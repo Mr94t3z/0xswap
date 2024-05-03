@@ -1,11 +1,11 @@
-import { Button, Frog, TextInput, parseEther } from 'frog'
+import { Button, Frog, TextInput } from 'frog'
 import { handle } from 'frog/vercel'
 import dotenv from 'dotenv';
 import qs from 'qs';
 
 // Uncomment this packages to tested on local server
-import { devtools } from 'frog/dev';
-import { serveStatic } from 'frog/serve-static';
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
 
 // Uncomment to use Edge Runtime.
 // export const config = {
@@ -20,6 +20,15 @@ export const app = new Frog({
   basePath: '/api/frame',
   // Supply a Hub to enable frame verification.
   // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
+  imageOptions: {
+    /* Other default options */
+    fonts: [
+      {
+        name: 'Space Mono',
+        source: 'google',
+      },
+    ],    
+  },
 })
 
 app.frame('/', (c) => {
@@ -28,7 +37,7 @@ app.frame('/', (c) => {
       <div
         style={{
           alignItems: 'center',
-          background: 'linear-gradient(to right, #432889, #17101F)',
+          background: '#FAB427',
           backgroundSize: '100% 100%',
           display: 'flex',
           flexDirection: 'column',
@@ -37,16 +46,37 @@ app.frame('/', (c) => {
           justifyContent: 'center',
           textAlign: 'center',
           width: '100%',
+          color: 'white',
+          fontFamily: 'Space Mono',
+          fontSize: 45,
+          fontStyle: 'normal',
+          letterSpacing: '-0.025em',
+          lineHeight: 1.4,
+          marginTop: 0,
+          padding: '0 120px',
+          whiteSpace: 'pre-wrap',
+          border: '1em solid rgb(255,255,255)'
         }}
       >
-        
+        <img
+            src='/dai.png'
+            style={{
+              width: 200,
+              height: 200,
+              borderRadius: 100,
+              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.5)",
+              marginBottom: 30,
+            }}
+            width={200} 
+            height={200} 
+          />
+        Swap DAI using 0x.org API Swap
       </div>
     ),
     intents: [
       <TextInput placeholder="Amount of $DAI e.g. 100" />,
       <Button.Transaction target="/buy">📈 Buy</Button.Transaction>,
       <Button.Transaction target="/sell">📉 Sell</Button.Transaction>,
-      <Button action="/">⏏︎ Cancel</Button>,
     ],
   })
 })
@@ -149,7 +179,7 @@ async (c) => {
 
 
 // Uncomment for local server testing
-devtools(app, { serveStatic });
+// devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
