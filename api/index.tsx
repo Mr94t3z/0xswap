@@ -18,6 +18,7 @@ dotenv.config();
 export const app = new Frog({
   assetsPath: '/',
   basePath: '/api/frame',
+  browserLocation : 'https://github.com/Mr94t3z/0xswap',
   // Supply a Hub to enable frame verification.
   // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
   imageOptions: {
