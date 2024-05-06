@@ -34,6 +34,7 @@ export const app = new Frog({
 
 app.frame('/', (c) => {
   return c.res({
+    action: '/finish',
     image: (
       <div
         style={{
@@ -175,6 +176,50 @@ async (c) => {
     to: quote.to,
     data: quote.data,
     value: quote.value,
+  })
+})
+
+
+app.frame('/finish', (c) => {
+  const { transactionId } = c
+  return c.res({
+    image: (
+      <div
+      style={{
+        alignItems: 'center',
+        background: '#FAB427',
+        backgroundSize: '100% 100%',
+        display: 'flex',
+        flexDirection: 'column',
+        flexWrap: 'nowrap',
+        height: '100%',
+        justifyContent: 'center',
+        textAlign: 'center',
+        width: '100%',
+        color: 'white',
+        fontFamily: 'Space Mono',
+        fontSize: 45,
+        fontStyle: 'normal',
+        letterSpacing: '-0.025em',
+        lineHeight: 1.4,
+        marginTop: 0,
+        padding: '0 120px',
+        whiteSpace: 'pre-wrap',
+        border: '1em solid rgb(255,255,255)'
+      }}
+    >
+     Transaction ID 📝 
+      <p style={{ justifyContent: 'center', textAlign: 'center', fontSize: 24, margin: 0 }}>{transactionId}</p>
+    </div>
+    ),
+    intents: [
+      <Button action='/'>← Back</Button>,
+      <Button.Link
+          href={`https://etherscan.io/tx/${transactionId}`}
+        >
+          View on Etherscan
+      </Button.Link>,
+    ],
   })
 })
 
