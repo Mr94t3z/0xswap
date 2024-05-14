@@ -4,8 +4,8 @@ import dotenv from 'dotenv';
 import qs from 'qs';
 
 // Uncomment this packages to tested on local server
-import { devtools } from 'frog/dev';
-import { serveStatic } from 'frog/serve-static';
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
 
 // Uncomment to use Edge Runtime.
 // export const config = {
@@ -32,6 +32,8 @@ export const app = new Frog({
   },
 })
 
+// 0x API Key
+const headers = { '0x-api-key': process.env.ZEROX_API_KEY || '' };
 
 async function fetchWithRetry(url: string | URL | Request, options = {}, retries = 3, backoff = 300) {
   try {
@@ -68,7 +70,6 @@ async function fetchDegenUsdPrice() {
     takerAddress: '0xcB46Bfb7315eca9ECd42D02C1AE174DA4BBFf291', // Taker address
   };
 
-  const headers = { '0x-api-key': process.env.ZEROX_API_KEY || '' };
   const url = `https://base.api.0x.org/swap/v1/price?${qs.stringify(params)}`;
 
   const data = await fetchWithRetry(url, { headers });
@@ -93,7 +94,6 @@ async function fetchDaiUsdPrice() {
     takerAddress: '0xcB46Bfb7315eca9ECd42D02C1AE174DA4BBFf291', // Taker address
   };
 
-  const headers = { '0x-api-key': process.env.ZEROX_API_KEY || '' };
   const url = `https://api.0x.org/swap/v1/price?${qs.stringify(params)}`;
 
   const data = await fetchWithRetry(url, { headers });
@@ -250,10 +250,10 @@ app.frame('/dai', (c) => {
       </div>
     ),
     intents: [
-      <TextInput placeholder="Amount of $DAI for Buy / $ETH for Sell" />,
+      <TextInput placeholder="Amt. of $DAI - Buy / $ETH - Sell" />,
       <Button.Transaction target="/dai-buy">📈 Buy</Button.Transaction>,
       <Button.Transaction target="/dai-sell">📉 Sell</Button.Transaction>,
-      <Button action="/">⏏︎ Back</Button>,
+      <Button.Reset>⏏︎ Back</Button.Reset>,
     ],
   })
 })
@@ -337,9 +337,6 @@ async (c) => {
     buyAmount: amountInWei.toString(), // Note that the DAI token uses 18 decimal places, so `sellAmount` is `100 * 10^18`.
     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
   };
-
-  // 0x API Key
-  const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
   
   // Fetch the swap quote.
   const response = await fetch(
@@ -386,9 +383,6 @@ async (c) => {
     sellAmount: amountInWei.toString(),
     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
   };
-
-  // 0x API Key
-  const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
   
   // Fetch the swap quote.
   const response = await fetch(
@@ -435,9 +429,6 @@ async (c) => {
     buyAmount: amountInWei.toString(), // Note that the DAI token uses 18 decimal places, so `sellAmount` is `100 * 10^18`.
     takerAddress: '0xcB46Bfb7315eca9ECd42D02C1AE174DA4BBFf291', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
   };
-
-  // 0x API Key
-  const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
   
   // Fetch the swap quote.
   const response = await fetch(
@@ -484,9 +475,6 @@ async (c) => {
     sellAmount: amountInWei.toString(),
     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
   };
-
-  // 0x API Key
-  const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
   
   // Fetch the swap quote.
   const response = await fetch(
@@ -596,7 +584,7 @@ app.frame('/degen-finish', (c) => {
 
 
 // Uncomment for local server testing
-devtools(app, { serveStatic });
+// devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
