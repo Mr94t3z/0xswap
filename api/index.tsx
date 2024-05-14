@@ -379,7 +379,7 @@ async (c) => {
   console.log(quote);
   
   return c.send({
-    chainId: 'eip155:1',
+    chainId: `eip155:${quote.chainId}` as any,
     to: quote.to,
     data: quote.data,
     value: quote.value,
@@ -425,7 +425,7 @@ async (c) => {
   const quote = await response.json();
   
   return c.send({
-    chainId: 'eip155:1',
+    chainId: `eip155:${quote.chainId}` as any,
     to: quote.to,
     data: quote.data,
     value: quote.value,
@@ -455,7 +455,7 @@ async (c) => {
   const params = {
     buyToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', //DEGEN
     sellToken: '0x4200000000000000000000000000000000000006', //WETH
-    buyAmount: amountInWei.toString(), // Note that the DAI token uses 18 decimal places, so `sellAmount` is `100 * 10^18`.
+    buyAmount: amountInWei.toString(),
     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
     // excludedSources: '0x,Kyber'
     includedSources: 'Uniswap_V3',
@@ -474,7 +474,7 @@ async (c) => {
   const quote = await response.json();
 
   return c.send({
-    chainId: 'eip155:8453',
+    chainId: `eip155:${quote.chainId}` as any,
     to: quote.to,
     data: quote.data,
     value: quote.value,
@@ -522,7 +522,7 @@ async (c) => {
   const quote = await response.json();
   
   return c.send({
-    chainId: 'eip155:8453',
+    chainId: `eip155:${quote.chainId}` as any,
     to: quote.to,
     data: quote.data,
     value: quote.value,
