@@ -15,6 +15,24 @@ import qs from 'qs';
 // Load environment variables from .env file
 dotenv.config();
 
+const cache = new Map();
+
+const setCache = (key: any, value: any, ttl: number) => {
+  const now = new Date().getTime();
+  const expiry = now + ttl;
+  cache.set(key, { value, expiry });
+};
+
+const getCache = (key: any) => {
+  const now = new Date().getTime();
+  const cached = cache.get(key);
+  if (cached && cached.expiry > now) {
+    return cached.value;
+  }
+  cache.delete(key);
+  return null;
+};
+
 export const app = new Frog({
   assetsPath: '/',
   basePath: '/api/frame',
@@ -35,13 +53,13 @@ export const app = new Frog({
 // 0x API Key
 const headers = { '0x-api-key': process.env.ZEROX_API_KEY || '' };
 
+
 async function fetchWithRetry(url: string | URL | Request, options = {}, retries = 3, backoff = 300) {
   try {
     const response = await fetch(url, options);
     if (!response.ok) {
       const errorText = await response.text();
       if (response.status === 429 && retries > 0) {
-        // Retry with exponential backoff
         await new Promise(res => setTimeout(res, backoff));
         return fetchWithRetry(url, options, retries - 1, backoff * 2);
       }
@@ -54,11 +72,20 @@ async function fetchWithRetry(url: string | URL | Request, options = {}, retries
   }
 }
 
-
 async function fetchWethUsdPrice() {
+  const cachedPrice = getCache('wethUsdPrice');
+  if (cachedPrice) {
+    return cachedPrice;
+  }
+
   const url = 'https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd';
   const data = await fetchWithRetry(url);
-  return data ? data.weth.usd : null;
+  if (data) {
+    const price = data.weth.usd;
+    setCache('wethUsdPrice', price, 60000); // Cache for 60 seconds
+    return price;
+  }
+  return null;
 }
 
 
@@ -306,7 +333,7 @@ app.frame('/degen', (c) => {
       <TextInput placeholder="Amount of $DEGEN e.g. 100" />,
       <Button.Transaction target="/degen-buy">📈 Buy</Button.Transaction>,
       <Button.Transaction target="/degen-sell">📉 Sell</Button.Transaction>,
-      <Button action="/">⏏︎ Back</Button>,
+      <Button.Reset>⏏︎ Back</Button.Reset>,
     ],
   })
 })
