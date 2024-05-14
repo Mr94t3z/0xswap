@@ -4,8 +4,8 @@ import dotenv from 'dotenv';
 import qs from 'qs';
 
 // Uncomment this packages to tested on local server
-import { devtools } from 'frog/dev';
-import { serveStatic } from 'frog/serve-static';
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
 
 // Uncomment to use Edge Runtime.
 // export const config = {
@@ -456,7 +456,7 @@ async (c) => {
     buyToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', //DEGEN
     sellToken: '0x4200000000000000000000000000000000000006', //WETH
     buyAmount: amountInWei.toString(),
-    takerAddress: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
     // excludedSources: '0x,Kyber'
     includedSources: 'Uniswap_V3',
     skipValidation: true
@@ -620,7 +620,7 @@ app.frame('/degen-finish', (c) => {
 
 
 // Uncomment for local server testing
-devtools(app, { serveStatic });
+// devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
