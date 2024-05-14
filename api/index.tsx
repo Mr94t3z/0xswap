@@ -32,9 +32,6 @@ export const app = new Frog({
   },
 })
 
-// 0x API Key
-const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
-
 // Function to fetch WETH to USD price
 async function fetchWethUsdPrice() {
   const url = 'https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd';
@@ -60,6 +57,9 @@ async function fetchDegenUsdPrice() {
     buyAmount: '1000000000000000000', // 1 DEGEN (DEGEN uses 18 decimal places)
     takerAddress: '0xcB46Bfb7315eca9ECd42D02C1AE174DA4BBFf291', // Taker address
   };
+
+  // 0x API Key
+  const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
   
   const url = `https://base.api.0x.org/swap/v1/price?${qs.stringify(params)}`;
 
@@ -96,6 +96,9 @@ async function fetchDaiUsdPrice() {
     sellAmount: '1000000000000000000', // 1 DAI (DAI uses 18 decimal places)
     takerAddress: '0xcB46Bfb7315eca9ECd42D02C1AE174DA4BBFf291', // Taker address
   };
+
+  // 0x API Key
+  const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
   
   const url = `https://api.0x.org/swap/v1/price?${qs.stringify(params)}`;
 
@@ -351,6 +354,9 @@ async (c) => {
     buyAmount: amountInWei.toString(), // Note that the DAI token uses 18 decimal places, so `sellAmount` is `100 * 10^18`.
     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
   };
+
+  // 0x API Key
+  const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
   
   // Fetch the swap quote.
   const response = await fetch(
@@ -397,6 +403,9 @@ async (c) => {
     sellAmount: amountInWei.toString(),
     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
   };
+
+  // 0x API Key
+  const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
   
   // Fetch the swap quote.
   const response = await fetch(
@@ -443,6 +452,9 @@ async (c) => {
     buyAmount: amountInWei.toString(), // Note that the DAI token uses 18 decimal places, so `sellAmount` is `100 * 10^18`.
     takerAddress: '0xcB46Bfb7315eca9ECd42D02C1AE174DA4BBFf291', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
   };
+
+  // 0x API Key
+  const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
   
   // Fetch the swap quote.
   const response = await fetch(
@@ -489,6 +501,9 @@ async (c) => {
     sellAmount: amountInWei.toString(),
     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
   };
+
+  // 0x API Key
+  const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
   
   // Fetch the swap quote.
   const response = await fetch(
