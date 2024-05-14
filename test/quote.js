@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import qs from 'qs';
-import fetch from 'node-fetch'; // Ensure you have node-fetch installed
 
 // Load environment variables from .env file
 dotenv.config();
