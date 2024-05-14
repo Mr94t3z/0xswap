@@ -32,24 +32,34 @@ export const app = new Frog({
   },
 })
 
-// Function to fetch WETH to USD price
-async function fetchWethUsdPrice() {
-  const url = 'https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd';
+
+async function fetchWithRetry(url: string | URL | Request, options = {}, retries = 3, backoff = 300) {
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, options);
     if (!response.ok) {
       const errorText = await response.text();
+      if (response.status === 429 && retries > 0) {
+        // Retry with exponential backoff
+        await new Promise(res => setTimeout(res, backoff));
+        return fetchWithRetry(url, options, retries - 1, backoff * 2);
+      }
       throw new Error(`HTTP error! Status: ${response.status} - ${errorText}`);
     }
-    const data = await response.json();
-    return data.weth.usd;
+    return response.json();
   } catch (error) {
-    console.error('Error fetching WETH price in USD:', error);
+    console.error('Error fetching data:', error);
     return null;
   }
 }
 
-// Function to fetch DEGEN price in USD
+
+async function fetchWethUsdPrice() {
+  const url = 'https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd';
+  const data = await fetchWithRetry(url);
+  return data ? data.weth.usd : null;
+}
+
+
 async function fetchDegenUsdPrice() {
   const params = {
     buyToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', // DEGEN
@@ -58,37 +68,23 @@ async function fetchDegenUsdPrice() {
     takerAddress: '0xcB46Bfb7315eca9ECd42D02C1AE174DA4BBFf291', // Taker address
   };
 
-  // 0x API Key
-  const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
-  
+  const headers = { '0x-api-key': process.env.ZEROX_API_KEY || '' };
   const url = `https://base.api.0x.org/swap/v1/price?${qs.stringify(params)}`;
 
-  try {
-    const response = await fetch(url, { headers });
+  const data = await fetchWithRetry(url, { headers });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP error! Status: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-
+  if (data) {
     const wethUsdPrice = await fetchWethUsdPrice();
     if (wethUsdPrice !== null) {
       const degenToWethRate = parseFloat(data.price);
       const degenToUsdPrice = degenToWethRate * wethUsdPrice;
-      return degenToUsdPrice.toFixed(5); // Return the price of DEGEN in USD
-    } else {
-      console.error('Could not fetch WETH price in USD');
-      return null;
+      return degenToUsdPrice.toFixed(5);
     }
-  } catch (error) {
-    console.error('Error fetching swap price:', error);
-    return null;
   }
+  console.error('Could not fetch WETH price in USD');
+  return null;
 }
 
-// Function to fetch DAI price in USD
 async function fetchDaiUsdPrice() {
   const params = {
     sellToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI
@@ -97,34 +93,21 @@ async function fetchDaiUsdPrice() {
     takerAddress: '0xcB46Bfb7315eca9ECd42D02C1AE174DA4BBFf291', // Taker address
   };
 
-  // 0x API Key
-  const headers = {'0x-api-key': process.env.ZEROX_API_KEY || ''};
-  
+  const headers = { '0x-api-key': process.env.ZEROX_API_KEY || '' };
   const url = `https://api.0x.org/swap/v1/price?${qs.stringify(params)}`;
 
-  try {
-    const response = await fetch(url, { headers });
+  const data = await fetchWithRetry(url, { headers });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP error! Status: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-
+  if (data) {
     const wethUsdPrice = await fetchWethUsdPrice();
     if (wethUsdPrice !== null) {
       const daiToWethRate = parseFloat(data.price);
       const daiToUsdPrice = daiToWethRate * wethUsdPrice;
-      return daiToUsdPrice.toFixed(5); // Return the price of DAI in USD
-    } else {
-      console.error('Could not fetch WETH price in USD');
-      return null;
+      return daiToUsdPrice.toFixed(5);
     }
-  } catch (error) {
-    console.error('Error fetching DAI swap price:', error);
-    return null;
   }
+  console.error('Could not fetch WETH price in USD');
+  return null;
 }
 
 
