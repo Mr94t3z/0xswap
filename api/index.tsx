@@ -456,7 +456,7 @@ async (c) => {
     buyToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', //DEGEN
     sellToken: '0x4200000000000000000000000000000000000006', //WETH
     buyAmount: amountInWei.toString(),
-    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    takerAddress: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
     // excludedSources: '0x,Kyber'
     includedSources: 'Uniswap_V3',
     skipValidation: true
@@ -472,6 +472,8 @@ async (c) => {
   }
 
   const quote = await response.json();
+
+  console.log(quote);
 
   return c.send({
     chainId: `eip155:${quote.chainId}` as any,
