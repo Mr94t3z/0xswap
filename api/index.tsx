@@ -330,7 +330,7 @@ app.frame('/degen', (c) => {
       </div>
     ),
     intents: [
-      <TextInput placeholder="Amount of $DEGEN e.g. 100" />,
+      <TextInput placeholder="Amount of $DEGEN e.g. 1000" />,
       <Button.Transaction target="/degen-buy">📈 Buy</Button.Transaction>,
       <Button.Transaction target="/degen-sell">📉 Sell</Button.Transaction>,
       <Button.Reset>⏏︎ Back</Button.Reset>,
@@ -375,6 +375,8 @@ async (c) => {
   }
 
   const quote = await response.json();
+
+  console.log(quote);
   
   return c.send({
     chainId: 'eip155:1',
@@ -443,7 +445,7 @@ app.transaction('/degen-buy', async (c, next) => {
   });
 },
 async (c) => {
-  const { inputText } = c;
+  const { inputText, address } = c;
   const inputValue = inputText ? parseFloat(inputText) : 0;
 
   // Assuming DAI token uses 18 decimal places
@@ -454,7 +456,10 @@ async (c) => {
     buyToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', //DEGEN
     sellToken: '0x4200000000000000000000000000000000000006', //WETH
     buyAmount: amountInWei.toString(), // Note that the DAI token uses 18 decimal places, so `sellAmount` is `100 * 10^18`.
-    takerAddress: '0xcB46Bfb7315eca9ECd42D02C1AE174DA4BBFf291', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    // excludedSources: '0x,Kyber'
+    includedSources: 'Uniswap_V3',
+    skipValidation: true
   };
   
   // Fetch the swap quote.
@@ -467,7 +472,7 @@ async (c) => {
   }
 
   const quote = await response.json();
-  
+
   return c.send({
     chainId: 'eip155:8453',
     to: quote.to,
@@ -497,10 +502,12 @@ async (c) => {
   const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
 
   const params = {
-    sellToken: '0x4200000000000000000000000000000000000006', //WETH
-    buyToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', //DEGEN
+    sellToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', //DEGEN
+    buyToken: '0x4200000000000000000000000000000000000006', //WETH
     sellAmount: amountInWei.toString(),
     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    includedSources: 'Uniswap_V3',
+    skipValidation: true
   };
   
   // Fetch the swap quote.
