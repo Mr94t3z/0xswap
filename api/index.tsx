@@ -124,6 +124,7 @@ async function fetchDaiUsdPrice() {
   }
 }
 
+
 app.frame('/', async (c) => {
   const degenUsdPrice = await fetchDegenUsdPrice(); // Fetch the DEGEN price in USD
   const daiUsdPrice = await fetchDaiUsdPrice(); // Fetch the DAI price in USD
@@ -218,6 +219,7 @@ app.frame('/', async (c) => {
   })
 })
 
+
 app.frame('/dai', (c) => {
   return c.res({
     action: '/dai-finish',
@@ -269,6 +271,7 @@ app.frame('/dai', (c) => {
     ],
   })
 })
+
 
 app.frame('/degen', (c) => {
   return c.res({
@@ -368,6 +371,53 @@ async (c) => {
   })
 })
 
+
+app.transaction('/dai-sell', async (c, next) => {
+  await next();
+  const txParams = await c.res.json();
+  txParams.attribution = false;
+  console.log(txParams);
+  c.res = new Response(JSON.stringify(txParams), {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+},
+async (c) => {
+  const { inputText, address } = c;
+  const inputValue = inputText ? parseFloat(inputText) : 0;
+
+  // Assuming DAI token uses 18 decimal places
+  const tokenDecimalPrecision = 18;
+  const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
+
+  const params = {
+    sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
+    buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
+    sellAmount: amountInWei.toString(),
+    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+  };
+  
+  // Fetch the swap quote.
+  const response = await fetch(
+    `https://api.0x.org/swap/v1/quote?${qs.stringify(params)}`, { headers }
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+
+  const quote = await response.json();
+  
+  return c.send({
+    chainId: 'eip155:1',
+    to: quote.to,
+    data: quote.data,
+    value: quote.value,
+  })
+})
+
+
 app.transaction('/degen-buy', async (c, next) => {
   await next();
   const txParams = await c.res.json();
@@ -414,7 +464,7 @@ async (c) => {
 })
 
 
-app.transaction('/dai-sell', async (c, next) => {
+app.transaction('/degen-sell', async (c, next) => {
   await next();
   const txParams = await c.res.json();
   txParams.attribution = false;
@@ -434,15 +484,15 @@ async (c) => {
   const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
 
   const params = {
-    sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
-    buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
+    sellToken: '0x4200000000000000000000000000000000000006', //WETH
+    buyToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', //DEGEN
     sellAmount: amountInWei.toString(),
     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
   };
   
   // Fetch the swap quote.
   const response = await fetch(
-    `https://api.0x.org/swap/v1/quote?${qs.stringify(params)}`, { headers }
+    `https://base.api.0x.org/swap/v1/quote?${qs.stringify(params)}`, { headers }
   );
 
   if (!response.ok) {
@@ -452,7 +502,7 @@ async (c) => {
   const quote = await response.json();
   
   return c.send({
-    chainId: 'eip155:1',
+    chainId: 'eip155:8453',
     to: quote.to,
     data: quote.data,
     value: quote.value,
