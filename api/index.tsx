@@ -4,8 +4,8 @@ import dotenv from 'dotenv';
 import qs from 'qs';
 
 // Uncomment this packages to tested on local server
-// import { devtools } from 'frog/dev';
-// import { serveStatic } from 'frog/serve-static';
+import { devtools } from 'frog/dev';
+import { serveStatic } from 'frog/serve-static';
 
 // Uncomment to use Edge Runtime.
 // export const config = {
@@ -351,7 +351,7 @@ app.transaction('/dai-buy', async (c, next) => {
   });
 },
 async (c) => {
-  const { inputText, address } = c;
+  const { inputText } = c;
   const inputValue = inputText ? parseFloat(inputText) : 0;
 
   // Assuming DAI token uses 18 decimal places
@@ -362,7 +362,7 @@ async (c) => {
     buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
     sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
     buyAmount: amountInWei.toString(), // Note that the DAI token uses 18 decimal places, so `sellAmount` is `100 * 10^18`.
-    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    takerAddress: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
   };
   
   // Fetch the swap quote.
@@ -399,7 +399,7 @@ app.transaction('/dai-sell', async (c, next) => {
   });
 },
 async (c) => {
-  const { inputText, address } = c;
+  const { inputText } = c;
   const inputValue = inputText ? parseFloat(inputText) : 0;
 
   // Assuming DAI token uses 18 decimal places
@@ -410,7 +410,7 @@ async (c) => {
     sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
     buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
     sellAmount: amountInWei.toString(),
-    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    takerAddress: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
   };
   
   // Fetch the swap quote.
@@ -618,7 +618,7 @@ app.frame('/degen-finish', (c) => {
 
 
 // Uncomment for local server testing
-// devtools(app, { serveStatic });
+devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
