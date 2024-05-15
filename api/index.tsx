@@ -356,7 +356,6 @@ async (c) => {
   const { inputText, address } = c;
   const inputValue = inputText ? parseFloat(inputText) : 0;
 
-  // Assuming DAI token uses 18 decimal places
   const tokenDecimalPrecision = 18;
   const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
 
@@ -405,7 +404,6 @@ async (c) => {
 //   const { inputText, address } = c;
 //   const inputValue = inputText ? parseFloat(inputText) : 0;
 
-//   // Assuming DAI token uses 18 decimal places
 //   const tokenDecimalPrecision = 18;
 //   const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
 
@@ -452,7 +450,6 @@ async (c) => {
   const { inputText, address } = c;
   const inputValue = inputText ? parseFloat(inputText) : 0;
 
-  // Assuming DAI token uses 18 decimal places
   const tokenDecimalPrecision = 18;
   const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
 
@@ -499,7 +496,6 @@ async (c) => {
 //   const { inputText, address } = c;
 //   const inputValue = inputText ? parseFloat(inputText) : 0;
 
-//   // Assuming DAI token uses 18 decimal places
 //   const tokenDecimalPrecision = 18;
 //   const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
 
