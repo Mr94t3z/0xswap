@@ -278,7 +278,7 @@ app.frame('/dai', (c) => {
       </div>
     ),
     intents: [
-      <TextInput placeholder="Amount of $DAI e.g. 100" />,
+      <TextInput placeholder="Amount of $DAI e.g. 0.1" />,
       // <TextInput placeholder="Amt. of $DAI - Buy / $ETH - Sell" />,
       <Button.Transaction target="/dai-buy">📈 Buy</Button.Transaction>,
       // <Button.Transaction target="/dai-sell">📉 Sell</Button.Transaction>,
