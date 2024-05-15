@@ -379,7 +379,7 @@ async (c) => {
   console.log(quote);
   
   return c.send({
-    chainId: `eip155:${quote.chainId}` as any,
+    chainId: 'eip155:1',
     to: quote.to,
     data: quote.data,
     value: quote.value,
@@ -425,7 +425,7 @@ async (c) => {
   const quote = await response.json();
   
   return c.send({
-    chainId: `eip155:${quote.chainId}` as any,
+    chainId: 'eip155:1',
     to: quote.to,
     data: quote.data,
     value: quote.value,
@@ -457,7 +457,7 @@ async (c) => {
     sellToken: '0x4200000000000000000000000000000000000006', //WETH
     buyAmount: amountInWei.toString(),
     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
-    // excludedSources: '0x,Kyber'
+    // excludedSources: '0x,Kyber',
     includedSources: 'Uniswap_V3',
     skipValidation: true
   };
@@ -476,7 +476,7 @@ async (c) => {
   console.log(quote);
 
   return c.send({
-    chainId: `eip155:${quote.chainId}` as any,
+    chainId: 'eip155:8453',
     to: quote.to,
     data: quote.data,
     value: quote.value,
@@ -524,7 +524,7 @@ async (c) => {
   const quote = await response.json();
   
   return c.send({
-    chainId: `eip155:${quote.chainId}` as any,
+    chainId: 'eip155:8453',
     to: quote.to,
     data: quote.data,
     value: quote.value,
