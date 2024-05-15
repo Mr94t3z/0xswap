@@ -1,5 +1,6 @@
 import { Button, Frog, TextInput } from 'frog'
 import { handle } from 'frog/vercel'
+// import { zeroxabi } from '../lib/0xAbi.js'
 import dotenv from 'dotenv';
 import qs from 'qs';
 
@@ -277,7 +278,7 @@ app.frame('/dai', (c) => {
       </div>
     ),
     intents: [
-      <TextInput placeholder="Amt. of $DAI - Buy / $ETH - Sell" />,
+      <TextInput placeholder="Amount of $DAI for Buy / $ETH for Sell" />,
       <Button.Transaction target="/dai-buy">📈 Buy</Button.Transaction>,
       <Button.Transaction target="/dai-sell">📉 Sell</Button.Transaction>,
       <Button.Reset>⏏︎ Back</Button.Reset>,
@@ -326,13 +327,13 @@ app.frame('/degen', (c) => {
             width={200} 
             height={200} 
           />
-        Swap $DEGEN ♾️ $WETH
+        Swap $ETH ♾️ $DEGEN
       </div>
     ),
     intents: [
-      <TextInput placeholder="Amount of $DEGEN e.g. 1000" />,
+      <TextInput placeholder="Amount of $ETH e.g. 0.01" />,
       <Button.Transaction target="/degen-buy">📈 Buy</Button.Transaction>,
-      <Button.Transaction target="/degen-sell">📉 Sell</Button.Transaction>,
+      // <Button.Transaction target="/degen-sell">📉 Sell</Button.Transaction>,
       <Button.Reset>⏏︎ Back</Button.Reset>,
     ],
   })
@@ -351,7 +352,7 @@ app.transaction('/dai-buy', async (c, next) => {
   });
 },
 async (c) => {
-  const { inputText } = c;
+  const { inputText, address } = c;
   const inputValue = inputText ? parseFloat(inputText) : 0;
 
   // Assuming DAI token uses 18 decimal places
@@ -362,7 +363,8 @@ async (c) => {
     buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
     sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
     buyAmount: amountInWei.toString(), // Note that the DAI token uses 18 decimal places, so `sellAmount` is `100 * 10^18`.
-    takerAddress: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    excludedSources: '0x,Kyber',
   };
   
   // Fetch the swap quote.
@@ -399,7 +401,7 @@ app.transaction('/dai-sell', async (c, next) => {
   });
 },
 async (c) => {
-  const { inputText } = c;
+  const { inputText, address } = c;
   const inputValue = inputText ? parseFloat(inputText) : 0;
 
   // Assuming DAI token uses 18 decimal places
@@ -410,7 +412,8 @@ async (c) => {
     sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
     buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
     sellAmount: amountInWei.toString(),
-    takerAddress: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    excludedSources: '0x,Kyber',
   };
   
   // Fetch the swap quote.
@@ -453,63 +456,11 @@ async (c) => {
   const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
 
   const params = {
+    sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
     buyToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', //DEGEN
-    sellToken: '0x4200000000000000000000000000000000000006', //WETH
-    buyAmount: amountInWei.toString(),
-    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
-    // excludedSources: '0x,Kyber',
-    includedSources: 'Uniswap_V3',
-    skipValidation: true
-  };
-  
-  // Fetch the swap quote.
-  const response = await fetch(
-    `https://base.api.0x.org/swap/v1/quote?${qs.stringify(params)}`, { headers }
-  );
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! Status: ${response.status}`);
-  }
-
-  const quote = await response.json();
-
-  console.log(quote);
-
-  return c.send({
-    chainId: 'eip155:8453',
-    to: quote.to,
-    data: quote.data,
-    value: quote.value,
-  })
-})
-
-
-app.transaction('/degen-sell', async (c, next) => {
-  await next();
-  const txParams = await c.res.json();
-  txParams.attribution = false;
-  console.log(txParams);
-  c.res = new Response(JSON.stringify(txParams), {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-},
-async (c) => {
-  const { inputText, address } = c;
-  const inputValue = inputText ? parseFloat(inputText) : 0;
-
-  // Assuming DAI token uses 18 decimal places
-  const tokenDecimalPrecision = 18;
-  const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
-
-  const params = {
-    sellToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', //DEGEN
-    buyToken: '0x4200000000000000000000000000000000000006', //WETH
     sellAmount: amountInWei.toString(),
     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
-    includedSources: 'Uniswap_V3',
-    skipValidation: true
+    excludedSources: '0x,Kyber',
   };
   
   // Fetch the swap quote.
@@ -522,7 +473,7 @@ async (c) => {
   }
 
   const quote = await response.json();
-  
+
   return c.send({
     chainId: 'eip155:8453',
     to: quote.to,
@@ -530,6 +481,53 @@ async (c) => {
     value: quote.value,
   })
 })
+
+
+// app.transaction('/degen-sell', async (c, next) => {
+//   await next();
+//   const txParams = await c.res.json();
+//   txParams.attribution = false;
+//   console.log(txParams);
+//   c.res = new Response(JSON.stringify(txParams), {
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//   });
+// },
+// async (c) => {
+//   const { inputText, address } = c;
+//   const inputValue = inputText ? parseFloat(inputText) : 0;
+
+//   // Assuming DAI token uses 18 decimal places
+//   const tokenDecimalPrecision = 18;
+//   const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
+
+//   const params = {
+//     sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
+//     buyToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', //DEGEN
+//     sellAmount: amountInWei.toString(),
+//     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+//     excludedSources: '0x,Kyber',
+//   };
+  
+//   // Fetch the swap quote.
+//   const response = await fetch(
+//     `https://base.api.0x.org/swap/v1/quote?${qs.stringify(params)}`, { headers }
+//   );
+
+//   if (!response.ok) {
+//     throw new Error(`HTTP error! Status: ${response.status}`);
+//   }
+
+//   const quote = await response.json();
+  
+//   return c.send({
+//     chainId: 'eip155:8453',
+//     to: quote.to,
+//     data: quote.data,
+//     value: quote.value,
+//   })
+// })
 
 
 app.frame('/dai-finish', (c) => {
