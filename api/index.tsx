@@ -278,9 +278,10 @@ app.frame('/dai', (c) => {
       </div>
     ),
     intents: [
-      <TextInput placeholder="Amt. of $DAI - Buy / $ETH - Sell" />,
+      <TextInput placeholder="Amount of $DAI e.g. 100" />,
+      // <TextInput placeholder="Amt. of $DAI - Buy / $ETH - Sell" />,
       <Button.Transaction target="/dai-buy">📈 Buy</Button.Transaction>,
-      <Button.Transaction target="/dai-sell">📉 Sell</Button.Transaction>,
+      // <Button.Transaction target="/dai-sell">📉 Sell</Button.Transaction>,
       <Button.Reset>⏏︎ Back</Button.Reset>,
     ],
   })
@@ -363,7 +364,7 @@ async (c) => {
     buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
     sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
     buyAmount: amountInWei.toString(), // Note that the DAI token uses 18 decimal places, so `sellAmount` is `100 * 10^18`.
-    takerAddress: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
     excludedSources: '0x,Kyber',
   };
   
@@ -389,51 +390,51 @@ async (c) => {
 })
 
 
-app.transaction('/dai-sell', async (c, next) => {
-  await next();
-  const txParams = await c.res.json();
-  txParams.attribution = false;
-  console.log(txParams);
-  c.res = new Response(JSON.stringify(txParams), {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-},
-async (c) => {
-  const { inputText, address } = c;
-  const inputValue = inputText ? parseFloat(inputText) : 0;
+// app.transaction('/dai-sell', async (c, next) => {
+//   await next();
+//   const txParams = await c.res.json();
+//   txParams.attribution = false;
+//   console.log(txParams);
+//   c.res = new Response(JSON.stringify(txParams), {
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//   });
+// },
+// async (c) => {
+//   const { inputText, address } = c;
+//   const inputValue = inputText ? parseFloat(inputText) : 0;
 
-  // Assuming DAI token uses 18 decimal places
-  const tokenDecimalPrecision = 18;
-  const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
+//   // Assuming DAI token uses 18 decimal places
+//   const tokenDecimalPrecision = 18;
+//   const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
 
-  const params = {
-    sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
-    buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
-    sellAmount: amountInWei.toString(),
-    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
-    // excludedSources: '0x,Kyber',
-  };
+//   const params = {
+//     sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
+//     buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
+//     sellAmount: amountInWei.toString(),
+//     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+//     // excludedSources: '0x,Kyber',
+//   };
   
-  // Fetch the swap quote.
-  const response = await fetch(
-    `https://api.0x.org/swap/v1/quote?${qs.stringify(params)}`, { headers }
-  );
+//   // Fetch the swap quote.
+//   const response = await fetch(
+//     `https://api.0x.org/swap/v1/quote?${qs.stringify(params)}`, { headers }
+//   );
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! Status: ${response.status}`);
-  }
+//   if (!response.ok) {
+//     throw new Error(`HTTP error! Status: ${response.status}`);
+//   }
 
-  const quote = await response.json();
+//   const quote = await response.json();
   
-  return c.send({
-    chainId: 'eip155:1',
-    to: quote.to,
-    data: quote.data,
-    value: quote.value,
-  })
-})
+//   return c.send({
+//     chainId: 'eip155:1',
+//     to: quote.to,
+//     data: quote.data,
+//     value: quote.value,
+//   })
+// })
 
 
 app.transaction('/degen-buy', async (c, next) => {
