@@ -413,7 +413,7 @@ async (c) => {
     buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
     sellAmount: amountInWei.toString(),
     takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
-    excludedSources: '0x,Kyber',
+    // excludedSources: '0x,Kyber',
   };
   
   // Fetch the swap quote.
