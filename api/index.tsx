@@ -412,7 +412,7 @@ async (c) => {
     sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
     buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
     sellAmount: amountInWei.toString(),
-    takerAddress: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
     excludedSources: '0x,Kyber',
   };
   
