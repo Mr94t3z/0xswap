@@ -363,7 +363,7 @@ async (c) => {
     buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
     sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
     buyAmount: amountInWei.toString(), // Note that the DAI token uses 18 decimal places, so `sellAmount` is `100 * 10^18`.
-    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    takerAddress: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
     excludedSources: '0x,Kyber',
   };
   
@@ -412,7 +412,7 @@ async (c) => {
     sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
     buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', //DAI
     sellAmount: amountInWei.toString(),
-    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    takerAddress: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
     excludedSources: '0x,Kyber',
   };
   
@@ -580,7 +580,7 @@ app.frame('/degen-finish', (c) => {
       <div
       style={{
         alignItems: 'center',
-        background: '#FAB427',
+        background: '#A36EFD',
         backgroundSize: '100% 100%',
         display: 'flex',
         flexDirection: 'column',
