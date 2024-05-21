@@ -5,8 +5,8 @@ import dotenv from 'dotenv';
 import qs from 'qs';
 
 // Uncomment this packages to tested on local server
-import { devtools } from 'frog/dev';
-import { serveStatic } from 'frog/serve-static';
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
 
 // Uncomment to use Edge Runtime.
 // export const config = {
@@ -489,7 +489,6 @@ async (c) => {
 })
 
 
-
 app.transaction('/dai-buy', async (c, next) => {
   await next();
   const txParams = await c.res.json();
@@ -808,7 +807,7 @@ app.frame('/degen-finish', (c) => {
 
 
 // Uncomment for local server testing
-devtools(app, { serveStatic });
+// devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
