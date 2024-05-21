@@ -443,6 +443,53 @@ app.frame('/degen', (c) => {
 })
 
 
+app.transaction('/arb-buy', async (c, next) => {
+  await next();
+  const txParams = await c.res.json();
+  txParams.attribution = false;
+  console.log(txParams);
+  c.res = new Response(JSON.stringify(txParams), {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+},
+async (c) => {
+  const { inputText, address } = c;
+  const inputValue = inputText ? parseFloat(inputText) : 0;
+
+  const tokenDecimalPrecision = 18;
+  const amountInWei = inputValue * Math.pow(10, tokenDecimalPrecision);
+
+  const params = {
+    sellToken: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //ETH
+    buyToken: '0x912CE59144191C1204E64559FE8253a0e49E6548', //ARBITRUM
+    sellAmount: amountInWei.toString(),
+    takerAddress: address, //Including takerAddress is required to help with gas estimation, catch revert issues, and provide the best price
+    excludedSources: '0x,Kyber',
+  };
+  
+  // Fetch the swap quote.
+  const response = await fetch(
+    `https://arbitrum.api.0x.org/swap/v1/quote?${qs.stringify(params)}`, { headers }
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+
+  const quote = await response.json();
+
+  return c.send({
+    chainId: 'eip155:42161',
+    to: quote.to,
+    data: quote.data,
+    value: quote.value,
+  })
+})
+
+
+
 app.transaction('/dai-buy', async (c, next) => {
   await next();
   const txParams = await c.res.json();
@@ -627,6 +674,50 @@ async (c) => {
 //     value: quote.value,
 //   })
 // })
+
+
+app.frame('/arb-finish', (c) => {
+  const { transactionId } = c
+  return c.res({
+    image: (
+      <div
+      style={{
+        alignItems: 'center',
+        background: '#203147',
+        backgroundSize: '100% 100%',
+        display: 'flex',
+        flexDirection: 'column',
+        flexWrap: 'nowrap',
+        height: '100%',
+        justifyContent: 'center',
+        textAlign: 'center',
+        width: '100%',
+        color: 'white',
+        fontFamily: 'Space Mono',
+        fontSize: 45,
+        fontStyle: 'normal',
+        letterSpacing: '-0.025em',
+        lineHeight: 1.4,
+        marginTop: 0,
+        padding: '0 120px',
+        whiteSpace: 'pre-wrap',
+        border: '1em solid rgb(157,204,237)'
+      }}
+    >
+     Transaction ID 📝 
+      <p style={{ justifyContent: 'center', textAlign: 'center', fontSize: 24, margin: 0 }}>{transactionId}</p>
+    </div>
+    ),
+    intents: [
+      <Button.Link
+          href={`https://arbiscan.io/tx/${transactionId}`}
+        >
+        ◉ View on Arbiscan
+      </Button.Link>,
+      <Button action='/arb'>⏏︎ Back</Button>,
+    ],
+  })
+})
 
 
 app.frame('/dai-finish', (c) => {
