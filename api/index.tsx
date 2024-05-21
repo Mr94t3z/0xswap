@@ -330,7 +330,7 @@ app.frame('/arb', (c) => {
     intents: [
       <TextInput placeholder="Amount of $ETH e.g. 0.05" />,
       <Button.Transaction target="/arb-buy">📈 Buy</Button.Transaction>,
-      <Button action='/'>⏏︎ Back</Button>,
+      <Button.Reset>⏏︎ Back</Button.Reset>,
     ],
   })
 })
