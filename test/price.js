@@ -22,15 +22,15 @@ async function fetchWethUsdPrice() {
 
 async function fetchSwapPrice() {
   const params = {
-    buyToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', // DEGEN
-    sellToken: '0x4200000000000000000000000000000000000006', // WETH
+    buyToken: '0x912CE59144191C1204E64559FE8253a0e49E6548', // ARBITRUM
+    sellToken: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1', // WETH
     buyAmount: '1000000000000000000', // 1 DEGEN (DEGEN uses 18 decimal places)
     takerAddress: '0xcB46Bfb7315eca9ECd42D02C1AE174DA4BBFf291', // Taker address
   };
 
   const headers = { '0x-api-key': process.env.ZEROX_API_KEY || '' };
   
-  const url = `https://base.api.0x.org/swap/v1/price?${qs.stringify(params)}`;
+  const url = `https://arbitrum.api.0x.org/swap/v1/price?${qs.stringify(params)}`;
   console.log('Request URL:', url);
   console.log('Headers:', headers);
 
@@ -47,9 +47,9 @@ async function fetchSwapPrice() {
 
     const wethUsdPrice = await fetchWethUsdPrice();
     if (wethUsdPrice !== null) {
-      const degenToWethRate = parseFloat(data.price);
-      const degenToUsdPrice = degenToWethRate * wethUsdPrice;
-      console.log(`Price of 1 DEGEN in USD: $${degenToUsdPrice.toFixed(5)}`);
+      const arbToWethRate = parseFloat(data.price);
+      const arbToUsdPrice = arbToWethRate * wethUsdPrice;
+      console.log(`Price of 1 ARB in USD: $${arbToUsdPrice.toFixed(5)}`);
     } else {
       console.error('Could not fetch WETH price in USD');
     }

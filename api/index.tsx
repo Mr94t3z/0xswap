@@ -5,8 +5,8 @@ import dotenv from 'dotenv';
 import qs from 'qs';
 
 // Uncomment this packages to tested on local server
-// import { devtools } from 'frog/dev';
-// import { serveStatic } from 'frog/serve-static';
+import { devtools } from 'frog/dev';
+import { serveStatic } from 'frog/serve-static';
 
 // Uncomment to use Edge Runtime.
 // export const config = {
@@ -90,6 +90,31 @@ async function fetchWethUsdPrice() {
 }
 
 
+async function fetchArbitrumUsdPrice() {
+  const params = {
+    buyToken: '0x912CE59144191C1204E64559FE8253a0e49E6548', // ARBITRUM
+    sellToken: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1', // WETH
+    buyAmount: '1000000000000000000', // 1 ARB (ARB uses 18 decimal places)
+    takerAddress: '0xcB46Bfb7315eca9ECd42D02C1AE174DA4BBFf291', // Taker address
+  };
+
+  const url = `https://arbitrum.api.0x.org/swap/v1/price?${qs.stringify(params)}`;
+
+  const data = await fetchWithRetry(url, { headers });
+
+  if (data) {
+    const wethUsdPrice = await fetchWethUsdPrice();
+    if (wethUsdPrice !== null) {
+      const arbToWethRate = parseFloat(data.price);
+      const arbToUsdPrice = arbToWethRate * wethUsdPrice;
+      return arbToUsdPrice.toFixed(5);
+    }
+  }
+  console.error('Could not fetch WETH price in USD');
+  return null;
+}
+
+
 async function fetchDegenUsdPrice() {
   const params = {
     buyToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', // DEGEN
@@ -140,6 +165,7 @@ async function fetchDaiUsdPrice() {
 
 
 app.frame('/', async (c) => {
+  const arbUsdPrice = await fetchArbitrumUsdPrice(); // Fetch the ARB price in USD
   const degenUsdPrice = await fetchDegenUsdPrice(); // Fetch the DEGEN price in USD
   const daiUsdPrice = await fetchDaiUsdPrice(); // Fetch the DAI price in USD
 
@@ -188,6 +214,29 @@ app.frame('/', async (c) => {
             }}
           >
             <img
+              src='/arb.png'
+              style={{
+                width: 100,
+                height: 100,
+                borderRadius: '50%',
+                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.5)",
+                backgroundColor: '#9DCCED',
+                marginBottom: 10,
+              }}
+              alt="ARB"
+            />
+            <div>ARB</div>
+            <p style={{ color: "#12A9FF", justifyContent: 'center', textAlign: 'center', fontSize: 28, margin: 0}}>${arbUsdPrice}</p>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              marginRight: 150
+            }}
+          >
+            <img
               src='/dai.png'
               style={{
                 width: 100,
@@ -227,8 +276,61 @@ app.frame('/', async (c) => {
       </div>
     ),
     intents: [
-      <Button action="/dai">Swap $DAI</Button>,
-      <Button action="/degen">Swap $DEGEN</Button>,
+      <Button action="/arb">$ARB</Button>,
+      <Button action="/dai">$DAI</Button>,
+      <Button action="/degen">$DEGEN</Button>,
+    ],
+  })
+})
+
+
+app.frame('/arb', (c) => {
+  return c.res({
+    action: '/arb-finish',
+    image: (
+      <div
+        style={{
+          alignItems: 'center',
+          background: '#203147',
+          backgroundSize: '100% 100%',
+          display: 'flex',
+          flexDirection: 'column',
+          flexWrap: 'nowrap',
+          height: '100%',
+          justifyContent: 'center',
+          textAlign: 'center',
+          width: '100%',
+          color: 'white',
+          fontFamily: 'Space Mono',
+          fontSize: 45,
+          fontStyle: 'normal',
+          letterSpacing: '-0.025em',
+          lineHeight: 1.4,
+          marginTop: 0,
+          padding: '0 120px',
+          whiteSpace: 'pre-wrap',
+          border: '1em solid rgb(157,204,237)'
+        }}
+      >
+        <img
+            src='/arb.png'
+            style={{
+              width: 200,
+              height: 200,
+              borderRadius: 100,
+              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.5)",
+              marginBottom: 50,
+            }}
+            width={200} 
+            height={200} 
+          />
+        Swap $ETH ♾️ $ARB
+      </div>
+    ),
+    intents: [
+      <TextInput placeholder="Amount of $ETH e.g. 0.05" />,
+      <Button.Transaction target="/arb-buy">📈 Buy</Button.Transaction>,
+      <Button action='/'>⏏︎ Back</Button>,
     ],
   })
 })
@@ -615,7 +717,7 @@ app.frame('/degen-finish', (c) => {
 
 
 // Uncomment for local server testing
-// devtools(app, { serveStatic });
+devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
